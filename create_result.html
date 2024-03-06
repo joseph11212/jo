@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  Select Student(s) <span class="small">and then click on proceed</span>
+{% endblock title %}
+
+{% block content %}
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-success" role="alert">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <form method="POST">
+    {% csrf_token %}
+    <div class="form-group">
+      <label for="session">Select Session:</label>
+      <select name="session" id="session" class="form-control">
+        <option value="" {% if not request.POST.session %} selected {% endif %} disabled>Select Session</option>
+        {% for session in sessions %}
+          <option value="{{ session.id }}" {% if request.POST.session == session.id %} selected {% endif %}>{{ session.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="term">Select Term:</label>
+      <select name="term" id="term" class="form-control">
+        <option value="" {% if not request.POST.term %} selected {% endif %} disabled>Select Term</option>
+        {% for term in terms %}
+          <option value="{{ term.id }}" {% if request.POST.term == term.id %} selected {% endif %}>{{ term.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="current_class">Select Class:</label>
+      <select name="current_class" id="current_class" class="form-control">
+        <option value="" {% if not request.POST.current_class %} selected {% endif %} disabled>Select Class</option>
+        {% for student_class in classes %}
+          <option value="{{ student_class.id }}" {% if request.POST.current_class == student_class.id %} selected {% endif %}>{{ student_class.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Select Subjects:</label>
+      {% for subject in subjects %}
+      <div class="form-check">
+        <input type="checkbox" name="selected_subjects" value="{{ subject.id }}" class="form-check-input" {% if request.POST.selected_subjects and subject.id in request.POST.selected_subjects %} checked {% endif %}>
+        <label class="form-check-label">{{ subject.name }}</label>
+      </div>
+      {% endfor %}
+    </div>
+    <button type="submit" class="btn btn-primary">Filter</button>
+  </form>
+
+  {% if students %}
+  <form method="POST">
+    {% csrf_token %}
+    <input type="hidden" name="session" value="{{ request.POST.session }}">
+    <input type="hidden" name="term" value="{{ request.POST.term }}">
+    <input type="hidden" name="current_class" value="{{ request.POST.current_class }}">
+    <input type="hidden" name="selected_subjects" value="{{ request.POST.selected_subjects }}">
+    <h2>Students</h2>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>S/N</th>
+          <th>Fullname</th>
+          <th>Registration Number</th>
+          <th>Gender</th>
+          <!-- Add more columns as needed -->
+          {% for subject in selected_subjects %}
+          <th>{{ subject.name }} Score</th>
+          {% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for student in students %}
+        <tr>
+          <td>{{ forloop.counter }}</td>
+          <td>{{ student.surname}} {{student.firstname }} {{student.other_name }}</td>
+          <td>{{ student.registration_number }}</td>
+          <td>{{ student.gender }}</td>
+          <!-- Add more cells for additional student information -->
+          {% for subject in selected_subjects %}
+          <td><input type="text" name="score_{{ student.id }}_{{ subject.id }}" placeholder="{{ subject.name }} Score"></td>
+          {% endfor %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <button type="submit" class="btn btn-success">Save Scores</button>
+  </form>
+  {% endif %}
+  
+  <script>
+    // Retain the state of checkboxes after form submission
+    window.addEventListener('DOMContentLoaded', () => {
+      const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+      checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', () => {
+          checkbox.setAttribute('checked', checkbox.checked);
+        });
+      });
+    });
+  </script>
+{% endblock content %}

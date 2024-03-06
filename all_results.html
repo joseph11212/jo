@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block fullcard %}
+
+  {% for key, result in results.items %}
+    <div class="card">
+      <div class="card-header">
+        {{result.student}}
+      </div>
+      <div class="card-body">
+        <table class="table table-bordered table-sm">
+          <thead class="thead-light">
+            <tr>
+              <th></th>
+              <th>Subject</th>
+              <th>midterm Score</th>
+              <th>terminal Score</th>
+              <th>Total Score</th>
+              <th>Average Score</th>
+              <th>Score Grade</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for subject in result.subjects %}
+              <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ subject.subject }}</td>
+                <td>{{ subject.midterm_score }}</td>
+                <td>{{ subject.terminal_score }}</td>
+                <td>{{ subject.total_score }}</td>
+                <td>{{ subject.average_score }}</td> <!-- Corrected typo here -->
+                <td>{{ subject.grade }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="2"></td>
+              <td>{{ result.midterm_total }}</td>
+              <td>{{ result.terminal_total }}</td>
+              <td>{{ result.total_total }}</td>
+              <td>{{ result.average_total }}</td>
+              <td>{{ result.grade_total }}</td>
+              <td></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+  {% endfor %}
+
+{% endblock fullcard %}
